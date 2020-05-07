@@ -644,7 +644,7 @@ class googleimagesdownload:
 
 
     # Download Images
-    def download_image(self,image_url,image_format,main_directory,dir_name,count,print_urls,socket_timeout,prefix,print_size,no_numbering,no_download,save_source,img_src,silent_mode,thumbnail_only,format,ignore_urls):
+    def download_image(self,search_keyword,image_url,image_format,main_directory,dir_name,count,print_urls,socket_timeout,prefix,print_size,no_numbering,no_download,save_source,img_src,silent_mode,thumbnail_only,format,ignore_urls):
         if not silent_mode:
             if print_urls or no_download:
                 print("Image URL: " + image_url)
@@ -712,9 +712,9 @@ class googleimagesdownload:
                     prefix = ''
 
                 if no_numbering:
-                    path = main_directory + "/" + dir_name + "/" + prefix + image_name
+                    path = main_directory + "/" + dir_name + "/" + prefix + search_keyword + ".jpeg" #image_name
                 else:
-                    path = main_directory + "/" + dir_name + "/" + prefix + str(count) + "." + image_name
+                    path = main_directory + "/" + dir_name + "/" + prefix + str(count) + "." + search_keyword + ".jpeg" #image_name
 
                 try:
                     output_file = open(path, 'wb')
@@ -821,7 +821,7 @@ class googleimagesdownload:
                     final_object = ""
             return final_object, end_object
 
-    def _get_all_items(self,image_objects,main_directory,dir_name,limit,arguments):
+    def _get_all_items(self,search_keyword,image_objects,main_directory,dir_name,limit,arguments):
         items = []
         abs_path = []
         errorCount = 0
@@ -839,7 +839,7 @@ class googleimagesdownload:
                         print("\nImage Metadata: " + str(object))
 
                 #download the images
-                download_status,download_message,return_image_name,absolute_path = self.download_image(object['image_link'],object['image_format'],main_directory,dir_name,count,arguments['print_urls'],arguments['socket_timeout'],arguments['prefix'],arguments['print_size'],arguments['no_numbering'],arguments['no_download'],arguments['save_source'],object['image_source'],arguments["silent_mode"],arguments["thumbnail_only"],arguments['format'],arguments['ignore_urls'])
+                download_status,download_message,return_image_name,absolute_path = self.download_image(search_keyword,object['image_link'],object['image_format'],main_directory,dir_name,count,arguments['print_urls'],arguments['socket_timeout'],arguments['prefix'],arguments['print_size'],arguments['no_numbering'],arguments['no_download'],arguments['save_source'],object['image_source'],arguments["silent_mode"],arguments["thumbnail_only"],arguments['format'],arguments['ignore_urls'])
                 if not arguments["silent_mode"]:
                     print(download_message)
                 if download_status == "success":
@@ -1023,7 +1023,7 @@ class googleimagesdownload:
                             print("Getting URLs without downloading images...")
                         else:
                             print("Starting Download...")
-                    items,errorCount,abs_path = self._get_all_items(images,main_directory,dir_name,limit,arguments)    #get all image items and download images
+                    items,errorCount,abs_path = self._get_all_items(search_keyword[i],images,main_directory,dir_name,limit,arguments)    #get all image items and download images
                     paths[pky + search_keyword[i] + sky] = abs_path
 
                     #dumps into a json file
@@ -1048,7 +1048,7 @@ class googleimagesdownload:
                             else:
                                 images, _ = self.download_extended_page(value,arguments['chromedriver'])
                             self.create_directories(main_directory, final_search_term,arguments['thumbnail'],arguments['thumbnail_only'])
-                            self._get_all_items(images, main_directory, search_term + " - " + key, limit,arguments)
+                            self._get_all_items(search_keyword[i],images, main_directory, search_term + " - " + key, limit,arguments)
 
                     i += 1
                     total_errors = total_errors + errorCount
